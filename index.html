@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tablero del Evento · Restaurant Plaza Gallo</title>
+<style>
+  :root{
+    --bg:#f6f3ee; --card:#ffffff; --ink:#2b2420; --muted:#7a6f66;
+    --accent:#b5452b; --accent-2:#e8a33d; --ok:#2f8f5b; --no:#c0392b; --pend:#8a8178;
+    --line:#e7e0d7; --radius:14px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);line-height:1.45}
+  header{background:linear-gradient(135deg,var(--accent),#7a2a18);color:#fff;padding:32px 20px 70px}
+  header .wrap{max-width:1100px;margin:auto}
+  header h1{margin:0 0 6px;font-size:clamp(1.6rem,4vw,2.4rem)}
+  header p{margin:0;opacity:.9}
+  main{max-width:1100px;margin:-50px auto 40px;padding:0 16px}
+  .grid{display:grid;gap:16px}
+  .info{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+  .card{background:var(--card);border-radius:var(--radius);padding:18px 20px;box-shadow:0 4px 18px rgba(0,0,0,.06);border:1px solid var(--line)}
+  .card h2{font-size:.8rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 8px}
+  .card .big{font-size:1.25rem;font-weight:700}
+  .card a{color:var(--accent)}
+  .menu ul{margin:6px 0 0;padding-left:18px}
+  .menu h3{margin:12px 0 2px;font-size:1rem;color:var(--accent)}
+  .stats{grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin:16px 0}
+  .stat{text-align:center}
+  .stat .n{font-size:2rem;font-weight:800}
+  .stat.ok .n{color:var(--ok)} .stat.no .n{color:var(--no)} .stat.pend .n{color:var(--pend)} .stat.lleg .n{color:var(--accent-2)}
+  .bar{height:10px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:8px}
+  .bar span{display:block;height:100%;background:var(--accent-2);transition:width .3s}
+  .toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:12px}
+  .toolbar input{flex:1;min-width:200px;padding:10px 12px;border-radius:10px;border:1px solid var(--line);font-size:1rem}
+  .toolbar select,.btn{padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:#fff;font-size:.95rem;cursor:pointer}
+  .btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+  table{width:100%;border-collapse:collapse}
+  th,td{padding:10px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+  th{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+  tr.llego td{background:#fff8e8}
+  .num{color:var(--muted);width:32px}
+  .tag{display:inline-block;font-size:.7rem;background:var(--accent-2);color:#fff;padding:2px 8px;border-radius:99px;margin-left:6px;vertical-align:middle}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .seg button{border:0;background:#fff;padding:7px 10px;cursor:pointer;font-size:.85rem;color:var(--muted)}
+  .seg button+button{border-left:1px solid var(--line)}
+  .seg button.on[data-v="si"]{background:var(--ok);color:#fff}
+  .seg button.on[data-v="no"]{background:var(--no);color:#fff}
+  .seg button.on[data-v="pend"]{background:var(--pend);color:#fff}
+  .check{display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-size:.9rem}
+  .check input{width:20px;height:20px;accent-color:var(--accent-2)}
+  .hora{font-size:.75rem;color:var(--muted);display:block}
+  .note{font-size:.8rem;color:var(--muted);margin-top:12px}
+  footer{text-align:center;color:var(--muted);font-size:.8rem;padding:20px}
+  @media (max-width:640px){
+    thead{display:none}
+    table,tbody,tr,td{display:block;width:100%}
+    tr{border-bottom:1px solid var(--line);padding:8px 0}
+    td{border:0;padding:4px 0}
+    .num{display:none}
+  }
+  @media print{
+    header{padding:16px;color:#000;background:none}
+    main{margin-top:0}
+    .toolbar,.btn,.note{display:none}
+    .card{box-shadow:none}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>🍖 Comida de convivencia</h1>
+    <p>Organiza: <strong>Javier Torres Rodríguez</strong> · Tablero de invitados, menú y asistencia</p>
+  </div>
+</header>
+
+<main>
+  <!-- Información del evento -->
+  <section class="grid info">
+    <div class="card">
+      <h2>📅 Día</h2>
+      <div class="big">14 de noviembre</div>
+    </div>
+    <div class="card">
+      <h2>🕒 Horario</h2>
+      <div class="big">A partir de las 3:00 pm</div>
+    </div>
+    <div class="card">
+      <h2>📍 Lugar</h2>
+      <div class="big">Restaurant Plaza Gallo</div>
+      <div>10 Berriozábal esquina</div>
+      <a href="https://www.google.com/maps/search/?api=1&query=Restaurant+Plaza+Gallo+10+Berriozabal" target="_blank" rel="noopener">Ver en mapa ↗</a>
+    </div>
+  </section>
+
+  <section class="card menu" style="margin-top:16px">
+    <h2>🍽️ Menú del evento</h2>
+    <h3>Entrada</h3>
+    <ul><li>Ensalada con aderezo</li><li>Bocoles</li></ul>
+    <h3>Comida · Parrillada</h3>
+    <ul>
+      <li>Carne, alitas, fajita, diezmillo y alambre</li>
+      <li>Salchicha, cebolla asada y chile toreado</li>
+      <li>Frijoles a la charra</li>
+    </ul>
+    <h3>Bebida</h3>
+    <ul><li>Refresco embotellado</li></ul>
+    <h3>Postre</h3>
+    <ul><li>Postre</li></ul>
+  </section>
+
+  <!-- Resumen -->
+  <section class="grid stats">
+    <div class="card stat"><h2>Invitados</h2><div class="n" id="sTotal">0</div></div>
+    <div class="card stat ok"><h2>Confirmados</h2><div class="n" id="sSi">0</div></div>
+    <div class="card stat no"><h2>No asistirán</h2><div class="n" id="sNo">0</div></div>
+    <div class="card stat pend"><h2>Pendientes</h2><div class="n" id="sPend">0</div></div>
+    <div class="card stat lleg"><h2>Ya llegaron</h2><div class="n" id="sLleg">0</div>
+      <div class="bar"><span id="barLleg" style="width:0"></span></div></div>
+  </section>
+
+  <!-- Lista -->
+  <section class="card">
+    <h2>👥 Lista de invitados</h2>
+    <div class="toolbar">
+      <input id="buscar" type="search" placeholder="Buscar invitado…">
+      <select id="filtro">
+        <option value="todos">Todos</option>
+        <option value="si">Confirmados</option>
+        <option value="no">No asistirán</option>
+        <option value="pend">Pendientes</option>
+        <option value="llego">Ya llegaron</option>
+        <option value="falta">Confirmados que faltan por llegar</option>
+      </select>
+      <button class="btn" id="btnCsv">⬇ Exportar CSV</button>
+      <button class="btn" onclick="window.print()">🖨 Imprimir</button>
+      <button class="btn" id="btnReset">↺ Reiniciar</button>
+    </div>
+    <table>
+      <thead><tr><th class="num">#</th><th>Nombre</th><th>Confirmación</th><th>Asistencia</th></tr></thead>
+      <tbody id="lista"></tbody>
+    </table>
+    <p class="note">Los cambios se guardan automáticamente en este navegador (localStorage).
+      Para compartir el estado con otra persona usa “Exportar CSV”.</p>
+  </section>
+</main>
+
+<footer>Tablero del evento · Restaurant Plaza Gallo</footer>
+
+<script>
+const INVITADOS = [
+  { nombre: "Javier Torres Rodríguez", rol: "Organizador" },
+  { nombre: "Alejandra Escobar Camacho" },
+  { nombre: "Alejandro Lavín García" },
+  { nombre: "Arturo Javier Maldonado Hernández" },
+  { nombre: "Blanca Esther Posada Flores" },
+  { nombre: "Brenda Dolores Zárate Sánchez" },
+  { nombre: "Claudia Argelia Vázquez Limón" },
+  { nombre: "Claudia Patricia González Barrón" },
+  { nombre: "Gabriela Honorato Saldaña" },
+  { nombre: "Graziella María Salinas Moreno" },
+  { nombre: "Iris Esperanza Ruiz Escobar" },
+  { nombre: "Karen Denisse Bautista Puga" },
+  { nombre: "Karina Rocha Hernández" },
+  { nombre: "Libio Alejandro Medrano Martínez" },
+  { nombre: "Ma. del Pilar Rendón Pérez" },
+  { nombre: "María de Jesús González Scott" },
+  { nombre: "Mirtala Serna Trejo" },
+  { nombre: "Severiana Narváez Alanis" },
+  { nombre: "Miguel Ángel Izquierdo Garza" },
+  { nombre: "José Mario Mota Vázquez" },
+  { nombre: "Loyda Ramírez López" }
+];
+
+const KEY = "tablero-evento-plaza-gallo-v1";
+let estado = cargar();
+
+function cargar(){
+  try { return JSON.parse(localStorage.getItem(KEY)) || {}; }
+  catch(e){ return {}; }
+}
+function guardar(){
+  try { localStorage.setItem(KEY, JSON.stringify(estado)); } catch(e){}
+}
+function get(i){ return estado[i] || { conf: "pend", llego: false, hora: "" }; }
+function set(i, cambios){ estado[i] = { ...get(i), ...cambios }; guardar(); render(); }
+
+const norm = s => s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
+
+function render(){
+  const q = norm(document.getElementById("buscar").value.trim());
+  const f = document.getElementById("filtro").value;
+  const tbody = document.getElementById("lista");
+  tbody.innerHTML = "";
+
+  INVITADOS.forEach((inv, i) => {
+    const e = get(i);
+    if (q && !norm(inv.nombre).includes(q)) return;
+    if (f === "si" && e.conf !== "si") return;
+    if (f === "no" && e.conf !== "no") return;
+    if (f === "pend" && e.conf !== "pend") return;
+    if (f === "llego" && !e.llego) return;
+    if (f === "falta" && !(e.conf === "si" && !e.llego)) return;
+
+    const tr = document.createElement("tr");
+    if (e.llego) tr.className = "llego";
+    tr.innerHTML = `
+      <td class="num">${i+1}</td>
+      <td><strong>${inv.nombre}</strong>${inv.rol ? `<span class="tag">${inv.rol}</span>` : ""}</td>
+      <td>
+        <div class="seg">
+          <button data-v="si"   class="${e.conf==='si'?'on':''}">✔ Asistirá</button>
+          <button data-v="no"   class="${e.conf==='no'?'on':''}">✖ No</button>
+          <button data-v="pend" class="${e.conf==='pend'?'on':''}">? Pendiente</button>
+        </div>
+      </td>
+      <td>
+        <label class="check"><input type="checkbox" ${e.llego?'checked':''}> Llegó</label>
+        ${e.llego && e.hora ? `<span class="hora">Registrado ${e.hora}</span>` : ""}
+      </td>`;
+    tr.querySelectorAll(".seg button").forEach(b =>
+      b.addEventListener("click", () => set(i, { conf: b.dataset.v })));
+    tr.querySelector("input[type=checkbox]").addEventListener("change", ev => {
+      const llego = ev.target.checked;
+      const hora = llego ? new Date().toLocaleTimeString("es-MX",{hour:"2-digit",minute:"2-digit"}) : "";
+      // Si llegó, se da por confirmado
+      set(i, llego ? { llego, hora, conf: "si" } : { llego, hora });
+    });
+    tbody.appendChild(tr);
+  });
+
+  if (!tbody.children.length)
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:var(--muted)">Sin resultados</td></tr>`;
+
+  // Resumen
+  const all = INVITADOS.map((_, i) => get(i));
+  const total = INVITADOS.length;
+  const si = all.filter(e => e.conf === "si").length;
+  const no = all.filter(e => e.conf === "no").length;
+  const lleg = all.filter(e => e.llego).length;
+  document.getElementById("sTotal").textContent = total;
+  document.getElementById("sSi").textContent = si;
+  document.getElementById("sNo").textContent = no;
+  document.getElementById("sPend").textContent = total - si - no;
+  document.getElementById("sLleg").textContent = `${lleg}/${si || total}`;
+  document.getElementById("barLleg").style.width = (si ? Math.min(100, lleg / si * 100) : 0) + "%";
+}
+
+document.getElementById("buscar").addEventListener("input", render);
+document.getElementById("filtro").addEventListener("change", render);
+
+document.getElementById("btnReset").addEventListener("click", () => {
+  if (confirm("¿Borrar todas las confirmaciones y asistencias?")) { estado = {}; guardar(); render(); }
+});
+
+document.getElementById("btnCsv").addEventListener("click", () => {
+  const txt = { si: "Asistirá", no: "No asistirá", pend: "Pendiente" };
+  const filas = [["#","Nombre","Rol","Confirmación","Llegó","Hora de llegada"]];
+  INVITADOS.forEach((inv, i) => {
+    const e = get(i);
+    filas.push([i+1, inv.nombre, inv.rol || "Invitado", txt[e.conf], e.llego ? "Sí" : "No", e.hora]);
+  });
+  const csv = "﻿" + filas.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(",")).join("\n");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+  a.download = "asistencia-evento.csv";
+  a.click();
+});
+
+render();
+</script>
+</body>
+</html>

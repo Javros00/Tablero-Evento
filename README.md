@@ -1,6 +1,6 @@
-# 🍖 Tablero del Evento – Restaurant Plaza Gallo
+# 🎄 Posada del Departamento – Restaurant Plaza Gallo
 
-Tablero web para la comida organizada por **Javier Torres Rodríguez**.
+Tablero web para la Posada del Departamento organizada por **Javier Torres Rodríguez**.
 
 - **Día:** 14 de noviembre
 - **Horario:** a partir de las 3:00 pm

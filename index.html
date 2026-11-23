@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Posada del Departamento · Restaurant Plaza Gallo</title>
+<title>Posada de Información en Salud, Análisis e Interpretación</title>
 <style>
   :root{
     --bg:#f6f3ee; --card:#ffffff; --ink:#2b2420; --muted:#7a6f66;
@@ -51,6 +51,8 @@
   .check input{width:20px;height:20px;accent-color:var(--accent-2)}
   .hora{font-size:.75rem;color:var(--muted);display:block}
   .note{font-size:.8rem;color:var(--muted);margin-top:12px}
+  .adm-off .adm{display:none!important}
+  .estado{font-size:.8rem;margin-left:auto;color:var(--muted)}
   footer{text-align:center;color:var(--muted);font-size:.8rem;padding:20px}
   @media (max-width:640px){
     thead{display:none}
@@ -70,8 +72,8 @@
 <body>
 <header>
   <div class="wrap">
-    <h1>🎄 Posada del Departamento Informacion en Salud </h1>
-    <p>Organiza: <strong>Mtro. Javier Torres Rodríguez</strong> · Tablero de invitados, menú y asistencia</p>
+    <h1>🎄 Posada de Información en Salud, Análisis e Interpretación</h1>
+    <p>Organiza: <strong>Mtro. Javier Torres Rodríguez</strong> · Confirma tu asistencia en la lista de abajo</p>
   </div>
 </header>
 
@@ -80,7 +82,7 @@
   <section class="grid info">
     <div class="card">
       <h2>📅 Día</h2>
-      <div class="big">14 de Diciembre</div>
+      <div class="big">14 de diciembre</div>
     </div>
     <div class="card">
       <h2>🕒 Horario</h2>
@@ -133,20 +135,20 @@
         <option value="llego">Ya llegaron</option>
         <option value="falta">Confirmados que faltan por llegar</option>
       </select>
-      <button class="btn" id="btnCsv">⬇ Exportar CSV</button>
+      <button class="btn adm" id="btnCsv">⬇ Exportar CSV</button>
       <button class="btn" onclick="window.print()">🖨 Imprimir</button>
-      <button class="btn" id="btnReset">↺ Reiniciar</button>
+      <button class="btn adm" id="btnReset">↺ Reiniciar</button>
+      <span class="estado" id="estado"></span>
     </div>
     <table>
-      <thead><tr><th class="num">#</th><th>Nombre</th><th>Confirmación</th><th>Asistencia</th></tr></thead>
+      <thead><tr><th class="num">#</th><th>Nombre</th><th>Confirmación</th><th class="adm">Asistencia</th></tr></thead>
       <tbody id="lista"></tbody>
     </table>
-    <p class="note">Los cambios se guardan automáticamente en este navegador (localStorage).
-      Para compartir el estado con otra persona usa “Exportar CSV”.</p>
+    <p class="note" id="nota"></p>
   </section>
 </main>
 
-<footer>Tablero del evento · Restaurant Plaza Gallo</footer>
+<footer>Posada de Información en Salud, Análisis e Interpretación · Restaurant Plaza Gallo</footer>
 
 <script>
 const INVITADOS = [
@@ -173,18 +175,64 @@ const INVITADOS = [
   { nombre: "Loyda Ramírez López" }
 ];
 
-const KEY = "tablero-evento-plaza-gallo-v1";
-let estado = cargar();
+/* ============================================================
+   CONFIGURACIÓN
+   SCRIPT_URL: pega aquí la URL de tu Apps Script (ver README).
+   Si se deja vacío, el tablero funciona solo en este navegador.
+   ============================================================ */
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzm6FpmY1ITBoLREy6o3L4-EZjL4hFlfyzvBkowBMVBZfI0p5AQe5AzcGlLo-jsibfw7w/exec";
 
-function cargar(){
+const KEY = "tablero-evento-plaza-gallo-v1";
+const EN_LINEA = !!SCRIPT_URL;
+// El organizador abre la página con ?organizador al final de la URL
+const ADMIN = new URLSearchParams(location.search).has("organizador");
+if (!ADMIN) document.body.classList.add("adm-off");
+
+let estado = {};
+
+function cargarLocal(){
   try { return JSON.parse(localStorage.getItem(KEY)) || {}; }
   catch(e){ return {}; }
 }
-function guardar(){
+function guardarLocal(){
   try { localStorage.setItem(KEY, JSON.stringify(estado)); } catch(e){}
 }
+function msg(t){ document.getElementById("estado").textContent = t; }
+
+async function cargarEnLinea(){
+  try {
+    const r = await fetch(SCRIPT_URL + "?t=" + Date.now());
+    const datos = await r.json();          // { "0": {conf,llego,hora}, ... }
+    estado = datos || {};
+    msg("✓ Actualizado " + new Date().toLocaleTimeString("es-MX",{hour:"2-digit",minute:"2-digit"}));
+  } catch(e){
+    msg("⚠ Sin conexión con la lista en línea");
+  }
+  render();
+}
+
+async function enviar(i){
+  if (!EN_LINEA) return;
+  msg("Guardando…");
+  try {
+    // text/plain evita la verificación CORS previa de Apps Script
+    await fetch(SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ i, nombre: INVITADOS[i].nombre, ...get(i) })
+    });
+    msg("✓ Guardado");
+  } catch(e){
+    msg("⚠ No se pudo guardar, intenta de nuevo");
+  }
+}
+
 function get(i){ return estado[i] || { conf: "pend", llego: false, hora: "" }; }
-function set(i, cambios){ estado[i] = { ...get(i), ...cambios }; guardar(); render(); }
+function set(i, cambios){
+  estado[i] = { ...get(i), ...cambios };
+  if (EN_LINEA) enviar(i); else guardarLocal();
+  render();
+}
 
 const norm = s => s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
 
@@ -210,12 +258,12 @@ function render(){
       <td><strong>${inv.nombre}</strong>${inv.rol ? `<span class="tag">${inv.rol}</span>` : ""}</td>
       <td>
         <div class="seg">
-          <button data-v="si"   class="${e.conf==='si'?'on':''}">✔ Asistirá</button>
-          <button data-v="no"   class="${e.conf==='no'?'on':''}">✖ No</button>
+          <button data-v="si"   class="${e.conf==='si'?'on':''}">✔ Asistiré</button>
+          <button data-v="no"   class="${e.conf==='no'?'on':''}">✖ No podré</button>
           <button data-v="pend" class="${e.conf==='pend'?'on':''}">? Pendiente</button>
         </div>
       </td>
-      <td>
+      <td class="adm">
         <label class="check"><input type="checkbox" ${e.llego?'checked':''}> Llegó</label>
         ${e.llego && e.hora ? `<span class="hora">Registrado ${e.hora}</span>` : ""}
       </td>`;
@@ -224,7 +272,6 @@ function render(){
     tr.querySelector("input[type=checkbox]").addEventListener("change", ev => {
       const llego = ev.target.checked;
       const hora = llego ? new Date().toLocaleTimeString("es-MX",{hour:"2-digit",minute:"2-digit"}) : "";
-      // Si llegó, se da por confirmado
       set(i, llego ? { llego, hora, conf: "si" } : { llego, hora });
     });
     tbody.appendChild(tr);
@@ -233,7 +280,6 @@ function render(){
   if (!tbody.children.length)
     tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:var(--muted)">Sin resultados</td></tr>`;
 
-  // Resumen
   const all = INVITADOS.map((_, i) => get(i));
   const total = INVITADOS.length;
   const si = all.filter(e => e.conf === "si").length;
@@ -251,7 +297,8 @@ document.getElementById("buscar").addEventListener("input", render);
 document.getElementById("filtro").addEventListener("change", render);
 
 document.getElementById("btnReset").addEventListener("click", () => {
-  if (confirm("¿Borrar todas las confirmaciones y asistencias?")) { estado = {}; guardar(); render(); }
+  if (EN_LINEA) { alert("En modo en línea, borra los datos directamente en la hoja de Google."); return; }
+  if (confirm("¿Borrar todas las confirmaciones y asistencias?")) { estado = {}; guardarLocal(); render(); }
 });
 
 document.getElementById("btnCsv").addEventListener("click", () => {
@@ -264,11 +311,21 @@ document.getElementById("btnCsv").addEventListener("click", () => {
   const csv = "﻿" + filas.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(",")).join("\n");
   const a = document.createElement("a");
   a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
-  a.download = "asistencia-evento.csv";
+  a.download = "asistencia-posada.csv";
   a.click();
 });
 
-render();
+document.getElementById("nota").textContent = EN_LINEA
+  ? "Busca tu nombre y elige “Asistiré” o “No podré”. Tu respuesta se guarda en línea y la ve el organizador."
+  : "Los cambios se guardan solo en este navegador. Configura SCRIPT_URL para confirmar en línea (ver README).";
+
+if (EN_LINEA) {
+  cargarEnLinea();
+  setInterval(cargarEnLinea, 30000);   // refresca cada 30 s
+} else {
+  estado = cargarLocal();
+  render();
+}
 </script>
 </body>
 </html>
